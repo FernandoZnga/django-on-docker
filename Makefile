@@ -22,6 +22,8 @@ migrations.create: docker.django.makemigrations ## create the most recent migrat
 
 migrations.show: docker.django.showmigrations ## list all migrations
 
+collect.static: docker.django.collectstatic ## collect all static file
+
 db.connection: database.connect ## open a sql connection to the db
 
 help:
