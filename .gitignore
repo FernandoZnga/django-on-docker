@@ -158,3 +158,4 @@ cython_debug/
 .env.local
 .env.staging
 .env.dev.db
+.env.prod.db
