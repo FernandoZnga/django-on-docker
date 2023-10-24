@@ -1,6 +1,6 @@
 # Project Setup
 
-If you want to jump ahead and just download the development version, you can go [here](https://github.com/FernandoZnga/django-on-docker/tree/development)
+If you want to jump ahead and just download the development version, you can go [here](https://github.com/FernandoZnga/django-on-docker/tree/development). If you want to run all steps, please, go ahead 👇
 
 ## Requirements
 We assume you already have (as of October 2023):
