@@ -1,4 +1,7 @@
 # Project Setup
+
+If you want to jump ahead and just download the development version, you can go [here](https://github.com/FernandoZnga/django-on-docker/tree/development)
+
 ## Requirements
 We assume you already have (as of October 2023):
 - Django v4.2.6
