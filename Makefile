@@ -16,11 +16,13 @@ containers.stop: docker.stop ## Stop all docker containers
 
 containers.prune: docker.prune ## Stop all docker containers
 
-migrations.run: docker.server.migrate ## run the migrations
+migrations.run: docker.django.migrate ## run the migrations
 
 migrations.create: docker.django.makemigrations ## create the most recent migrations
 
-migrations.show: docker.django.showmigrations
+migrations.show: docker.django.showmigrations ## list all migrations
+
+db.connection: database.connect ## open a sql connection to the db
 
 help:
 	@echo "------------------------------HELP MENU----------------------------------"

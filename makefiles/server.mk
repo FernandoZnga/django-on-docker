@@ -12,8 +12,8 @@ docker.start: ## Start docker container
 	docker compose start
 
 docker.stop: ## Stop all containers
-	#docker compose stop
-	docker stop $(docker ps -a -q)
+	docker compose stop
+	#docker stop $(docker ps -a -q)
 
 docker.django.migrate: ## Run all pending migrations
 	docker-compose exec web python manage.py migrate --noinput
@@ -27,5 +27,8 @@ docker.django.showmigrations: ## Create a new migration
 docker.prune: ## Well.. prune everything
 	#docker system prune --all --volumes --force
 	docker system prune -a
-docker.restart: ## Well.. prune everything
+docker.restart: ## stop and start it again
 	docker compose stop && docker compose start
+
+database.connect: ## connect to the db
+	docker-compose exec db psql --username=${SQL_USER} --dbname=${SQL_DATABASE}
