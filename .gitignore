@@ -152,9 +152,10 @@ cython_debug/
 #.idea/
 
 # Secrets remain secrets
-.env.dev
+.env.prod
 .env.prod
 .env.test
 .env.local
 .env.staging
-.env.dev.db
+.env.prod.db
+.env.prod.db
