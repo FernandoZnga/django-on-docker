@@ -628,6 +628,165 @@ $ make project.build
 $ make migrations.run
 $ make collect.static
 ```
+## Media Files
+Let's create a new django application using the dev environment:
+```shell
+$ docker-compose up -d --build
+$ docker-compose exec web python manage.py startapp upload
+```
+And add the new app into the `INSTALLED_APPS`
+```text
+INSTALLED_APPS = [
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+
+    "upload",
+]
+```
+Update `app/upload/views.py` file with the following:
+```python
+from django.shortcuts import render
+from django.core.files.storage import FileSystemStorage
+
+def image_upload(request):
+    if request.method == "POST" and request.FILES["image_file"]:
+        image_file = request.FILES["image_file"]
+        fs = FileSystemStorage()
+        filename = fs.save(image_file.name, image_file)
+        image_url = fs.url(filename)
+        print(image_url)
+        return render(request, "upload.html", {
+            "image_url": image_url
+        })
+    return render(request, "upload.html")
+```
+Add a `templates` new folder into `app/upload/` and create the file `upload.html`:
+```html
+{% block content %}
+<form action="{% url "upload" %}" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <input type="file" name="image_file">
+    <input type="submit" value="submit" />
+  </form>
+  {% if image_url %}
+    <p>File uploaded at: <a href="{{ image_url }}">{{ image_url }}</a></p>
+  {% endif %}
+{% endblock %}
+```
+Update the `app/django_project/urls.py`:
+```python
+from django.contrib import admin
+from django.urls import path
+from django.conf import settings
+from django.conf.urls.static import static
+
+from upload.views import image_upload
+urlpatterns = [
+    path("", image_upload, name="upload"),
+    path("admin/", admin.site.urls),
+]
+if bool(settings.DEBUG):
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+```
+Finally, put the `MEDIA_URL` in `settings.py`:
+```text
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "mediafiles"
+```
+Now that we have the Media, let's add a volume in the `docker-compose.prod.yml`
+```text
+version: '3.9'
+services:
+  web:
+    build:
+      context: ./app
+      dockerfile: Dockerfile.prod
+    command: gunicorn django_project.wsgi:application --bind 0.0.0.0:8000
+    volumes:
+      - static_volume:/home/app/web/staticfiles
+      - media_volume:/home/app/web/mediafiles
+    expose:
+      - 8000
+    env_file:
+      - ./.env.prod
+    depends_on:
+      - db
+  db:
+    image: postgres:15
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    env_file:
+      - ./.env.prod.db
+  nginx:
+    build: ./nginx
+    volumes:
+      - static_volume:/home/app/web/staticfiles
+      - media_volume:/home/app/web/mediafiles
+    ports:
+      - 1337:80
+    depends_on:
+      - web
+volumes:
+  postgres_data:
+  static_volume:
+  media_volume:
+```
+New folder in the `Dockerfile.prod`
+```dockerfile
+#...
+# create the appropriate directories
+ENV HOME=/home/app
+ENV APP_HOME=/home/app/web
+RUN mkdir $APP_HOME
+RUN mkdir $APP_HOME/staticfiles
+RUN mkdir $APP_HOME/mediafiles
+WORKDIR $APP_HOME
+...
+```
+Update `nginx.conf` with
+```text
+upstream django_project {
+    server web:8000;
+}
+
+server {
+
+    listen 80;
+
+    location / {
+        proxy_pass http://django_project;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $host;
+        proxy_redirect off;
+    }
+
+    location /static/ {
+        alias /home/app/web/staticfiles/;
+    }
+
+    location /media/ {
+        alias /home/app/web/mediafiles/;
+    }
+
+}
+```
+One more addition into `settings.py`:
+```text
+CSRF_TRUSTED_ORIGINS = ["http://localhost:1337"]
+```
+And rebuild:
+```shell
+$ docker-compose down -v
+$ docker-compose -f docker-compose.prod.yml up -d --build
+$ docker-compose -f docker-compose.prod.yml exec web python manage.py migrate --noinput
+$ docker-compose -f docker-compose.prod.yml exec web python manage.py collectstatic --no-input --clear
+```
+Now you should be able to upload a file from here http://localhost:1337/
+and view the file here http://localhost:1337/media/IMAGE_FILE_NAME.
 Useful information you could use:
 https://www.digitalocean.com/community/tutorials/how-to-set-up-django-with-postgres-nginx-and-gunicorn-on-ubuntu-18-04
 https://awstip.com/dockerizing-django-application-gunicorn-and-nginx-django-on-docker-46fefa3114c4
