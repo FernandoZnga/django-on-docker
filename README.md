@@ -84,7 +84,8 @@ DEBUG = bool(os.environ.get("DEBUG", default=0))
 # For example: 'DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1]'
 ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split(" ")
 ```
-The "secrets" should be remains that way, SECRET, this variables should be included in the `.env.dev` file (root project folder).
+The "secrets" should be remains that way, SECRET,
+these variables should be included in the `.env.dev` file (root project folder).
 
 Folder structure by this point:
 ```text
@@ -134,7 +135,7 @@ services:
 volumes:
   postgres_data:
 ```
-Make sure to add this new variables/values into the `.env.dev` file and update the `settings.py` file.
+Make sure to add these new variables/values into the `.env.dev` file and update the `settings.py` file.
 ```text
 # env file
 DEBUG=true
@@ -198,7 +199,7 @@ Then update the permission:
 ```bash
 $ chmod +x app/entrypoint.sh
 ```
-Don't forget to update the `Dockerfile`, add the `entrypoint.sh` file, so it run as the Docker entry point:
+Remember to update the `Dockerfile`, add the `entrypoint.sh` file, so it runs as the Docker entry point:
 ```Dockerfile
 # pull official base image
 FROM python:3.11.4-slim-buster
@@ -243,7 +244,7 @@ SQL_HOST=db
 SQL_PORT=5432
 DATABASE=postgres
 ```
-By this point your project folder should look like:
+By this point, your project folder should look like:
 ```text
 └── app
     ├── django_project
