@@ -12,7 +12,8 @@ docker.start: ## Start docker container
 	docker compose start
 
 docker.stop: ## Stop all containers
-	docker compose stop
+	#docker compose stop
+	docker stop $(docker ps -a -q)
 
 docker.django.migrate: ## Run all pending migrations
 	docker-compose exec web python manage.py migrate --noinput
@@ -24,7 +25,7 @@ docker.django.showmigrations: ## Create a new migration
 	docker-compose exec web python manage.py showmigrations
 
 docker.prune: ## Well.. prune everything
-	docker system prune --all --volumes --force
-
+	#docker system prune --all --volumes --force
+	docker system prune -a
 docker.restart: ## Well.. prune everything
 	docker compose stop && docker compose start
