@@ -35,4 +35,5 @@ help:
 	@echo "	To create the migrations type    'make migrations.create'"
 	@echo "	To apply the migrations type     'make migrations.run'"
 	@echo "	To view the migrations type      'make migrations.show'"
+	@echo "	Open a sql connection to the db  'make db.connection'"
 	@echo "-------------------------------------------------------------------------"
