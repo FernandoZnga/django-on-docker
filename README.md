@@ -259,3 +259,44 @@ By this point your project folder should look like:
 └── env.dev
 └── docker-compose.yml
 ```
+If you remember, we leave the database credentials in the `docker.compose.yml` file
+```text
+    environment:
+      - POSTGRES_USER=django_user
+      - POSTGRES_PASSWORD=django_password
+      - POSTGRES_DB=django_project
+```
+Instead of leaving it, at clear sight, let's create a new file `.env.dev.db` and type:
+```text
+POSTGRES_USER=django_user
+POSTGRES_PASSWORD=django_password
+POSTGRES_DB=django_project
+```
+Back in the `docker-compose.yml`, update the content with the following:
+```text
+version: '3.9'
+services:
+  web:
+    build: ./app
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./app/:/usr/src/app/
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./.env.dev
+    depends_on:
+      - db
+  db:
+    image: postgres:15
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    env_file:
+      - ./.env.dev.db
+volumes:
+  postgres_data:
+```
+Notice that we remove the `environment` values and add the `env_file` section. Remember to add the `.env.dev.db` file as part if the `.gitignore`.
+Run `make project.build` and you are done here.
+
+Happy Coding!
