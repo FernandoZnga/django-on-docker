@@ -1,6 +1,6 @@
 ### SERVER
 # --------
-include .env.prod
+include .env.dev
 
 docker.build: ## Build server in its docker container
 	docker-compose up -d --build
