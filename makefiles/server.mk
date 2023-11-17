@@ -12,7 +12,7 @@ docker.start: ## Start docker container
 	docker compose start
 
 docker.stop: ## Stop all containers
-	docker compose stop
+	docker stop $(docker ps -a -q)
 
 docker.django.migrate: ## Run all pending migrations
 	docker-compose exec web python manage.py migrate --noinput
